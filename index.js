@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import Stats from 'three/addons/libs/stats.module.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -8,6 +9,8 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
+const stats = new Stats();
+document.body.appendChild( stats.dom );
 
 function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) {
   let shape = new THREE.Shape();
@@ -24,7 +27,7 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
     bevelSegments: 10,
     // steps: 1,
     bevelSize: 0.1,
-    bevelThickness: 0.1,
+    bevelThickness: 0.05,
     // curveSegments: smoothness
   });
 
@@ -34,7 +37,12 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
 }
 
 
-const geometry = createBoxWithRoundedEdges( 2, 2, 0.1, 0.1, 3 );
+const geometry = createBoxWithRoundedEdges( 2, 2, 0.05, 0.1, 3 );
+
+const count = geometry.attributes.position.count;
+
+
+
 const material = new THREE.MeshStandardMaterial( { color: 0x00b0df } );
 const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
@@ -49,6 +57,7 @@ const controls = new OrbitControls( camera, renderer.domElement );
 function animate() {
 	requestAnimationFrame( animate );
 	controls.update();
+    stats.update();
 	renderer.render( scene, camera );
 }
 
