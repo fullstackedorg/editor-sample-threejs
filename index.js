@@ -41,7 +41,8 @@ const geometry = createBoxWithRoundedEdges( 2, 2, 0.05, 0.1, 3 );
 
 const count = geometry.attributes.position.count;
 
-
+const color1 = "hsl(194, 87%, 50%)";
+const color2 = "hsl(208, 68%, 44%)";
 
 const material = new THREE.MeshStandardMaterial( { color: 0x00b0df } );
 const cube = new THREE.Mesh( geometry, material );
