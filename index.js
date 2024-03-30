@@ -37,7 +37,7 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
 }
 
 
-const geometry = createBoxWithRoundedEdges( 2, 2, 0.05, 0.1, 3 );
+const geometry = createBoxWithRoundedEdges( 2, 2, 0.08, 0.1, 3 );
 
 const count = geometry.attributes.position.count;
 
