@@ -83,6 +83,7 @@ const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
 
+
 const lineMaterial = new THREE.LineDashedMaterial( {
 	color: 0x9DD1EC,
     scale: 1,
@@ -91,10 +92,10 @@ const lineMaterial = new THREE.LineDashedMaterial( {
 } );
 
 const curve = new THREE.CatmullRomCurve3( [
-	new THREE.Vector3( -delta/2 + 0.5, -delta/2, 0.06 ),
-	new THREE.Vector3( -delta/2 + 0.5, -delta/2 + 0.05, 0.1 ),
-	new THREE.Vector3( -delta/2 + 0.5, delta/2 - 0.05, 0.1 ),
-	new THREE.Vector3( -delta/2 + 0.5, delta/2, 0.06 )
+	new THREE.Vector3( 0, -delta/2, 0.06 ),
+	new THREE.Vector3( 0, -delta/2 + 0.05, 0.1 ),
+	new THREE.Vector3( 0, delta/2 - 0.05, 0.1 ),
+	new THREE.Vector3( 0, delta/2, 0.06 )
 ] );
 const linePoints = curve.getPoints( 50 )
 
@@ -104,6 +105,14 @@ const line = new THREE.Line( lineGeometry, lineMaterial );
 line.computeLineDistances();
 scene.add( line );
 
+const circleGeometry = new THREE.BufferGeometry().setFromPoints(
+    new THREE.Path().absarc(0, 0, 0.5, 0, Math.PI * 2).getSpacedPoints(50)
+);
+const circle = new THREE.LineLoop( circleGeometry, lineMaterial )
+circle.computeLineDistances()
+circle.position.z = 0.15
+
+scene.add( circle );
 
 const light = new THREE.HemisphereLight( 0xfffff, 0xcccccc, 2 ); 
 scene.add( light );
