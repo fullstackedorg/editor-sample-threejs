@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff)
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -104,8 +105,7 @@ line.computeLineDistances();
 scene.add( line );
 
 
-
-const light = new THREE.HemisphereLight( 0xfffff, 0x262626, 1 ); 
+const light = new THREE.HemisphereLight( 0xfffff, 0xcccccc, 2 ); 
 scene.add( light );
 
 camera.position.z = 5;
