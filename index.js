@@ -40,11 +40,44 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
 const geometry = createBoxWithRoundedEdges( 2, 2, 0.08, 0.1, 3 );
 
 const count = geometry.attributes.position.count;
+geometry.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
-const color1 = "hsl(194, 87%, 50%)";
-const color2 = "hsl(208, 68%, 44%)";
+const positions = geometry.attributes.position;
+const gradient = geometry.attributes.color;
+const color = new THREE.Color();
 
-const material = new THREE.MeshStandardMaterial( { color: 0x00b0df } );
+// hsl(208, 68%, 44%)
+const colorStop1 = [0.57, 0.68, 0.44];
+// hsl(194, 87%, 50%)
+const colorStop2 = [0.53, 0.87, 0.50];
+
+let maxY = positions.getY(0), minY = positions.getY(0);
+for ( let i = 0; i < count; i++ ) {
+    const y = positions.getY( i );
+    if(y < minY)
+        minY = y;
+    if(y > maxY)
+        maxY = y;
+}
+
+const delta = maxY - minY;
+for ( let i = 0; i < count; i++ ) {
+    const y = positions.getY( i );
+    const percent = (y - minY) / delta; 
+    const hue = (colorStop2[0] - colorStop1[0]) * percent + colorStop1[0]
+    const sat = (colorStop2[1] - colorStop1[1]) * percent + colorStop1[1]
+    const lum = (colorStop2[2] - colorStop1[2]) * percent + colorStop1[2]
+    color.setHSL( hue , sat, lum, THREE.SRGBColorSpace );
+    gradient.setXYZ( i, color.r, color.g, color.b );
+}
+
+const material = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					flatShading: true,
+					vertexColors: true,
+					shininess: 0
+				} );
+
 const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
