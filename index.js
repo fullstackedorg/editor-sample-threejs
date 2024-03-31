@@ -106,7 +106,7 @@ line.computeLineDistances();
 scene.add( line );
 
 const circleGeometry = new THREE.BufferGeometry().setFromPoints(
-    new THREE.Path().absarc(0, 0, 0.5, 0, Math.PI * 2).getSpacedPoints(50)
+    new THREE.Path().absarc(0, 0, 0.5, 0, Math.PI * 2).getSpacedPoints(100)
 );
 const circle = new THREE.LineLoop( circleGeometry, lineMaterial )
 circle.computeLineDistances()
