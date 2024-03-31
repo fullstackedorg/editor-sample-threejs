@@ -81,6 +81,30 @@ const material = new THREE.MeshPhongMaterial( {
 const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
+
+const lineMaterial = new THREE.LineDashedMaterial( {
+	color: 0x9DD1EC,
+    scale: 1,
+	dashSize: 0.001,
+	gapSize: 10,
+} );
+
+const curve = new THREE.CatmullRomCurve3( [
+	new THREE.Vector3( -delta/2 + 0.5, -delta/2, 0.06 ),
+	new THREE.Vector3( -delta/2 + 0.5, -delta/2 + 0.05, 0.1 ),
+	new THREE.Vector3( -delta/2 + 0.5, delta/2 - 0.05, 0.1 ),
+	new THREE.Vector3( -delta/2 + 0.5, delta/2, 0.06 )
+] );
+const linePoints = curve.getPoints( 50 )
+
+const lineGeometry = new THREE.BufferGeometry().setFromPoints( linePoints );
+
+const line = new THREE.Line( lineGeometry, lineMaterial );
+line.computeLineDistances();
+scene.add( line );
+
+
+
 const light = new THREE.HemisphereLight( 0xfffff, 0x262626, 1 ); 
 scene.add( light );
 
@@ -92,6 +116,10 @@ function animate() {
 	requestAnimationFrame( animate );
 	controls.update();
     stats.update();
+    line.material.dashSize = line.material.dashSize + 0.01;
+    if(line.material.dashSize >= 3)
+        line.material.dashSize = 0.001
+    line.computeLineDistances();
 	renderer.render( scene, camera );
 }
 
