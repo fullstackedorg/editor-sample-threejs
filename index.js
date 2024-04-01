@@ -214,15 +214,13 @@ loader.load(
         let size = bb.getSize(new THREE.Vector3());
         svg.position.x -= size.x / 2
         svg.position.y += size.y / 2
-        svg.position.z += 0.2
+        svg.position.z += 0.14
 		scene.add( svg );
 
 	}
 );
 
 
-
-let svgForward = false;
 function animate() {
 	requestAnimationFrame( animate );
 	controls.update();
@@ -235,12 +233,6 @@ function animate() {
             line.material.scale = 600;
         }
     })
-    if(svg){
-        if(svg.position.z <= 0.09 || svg.position.z >= 0.4) {
-            svgForward = !svgForward
-        }
-        svg.position.z += svgForward ? 0.001 : -0.001;
-    }
 	renderer.render( scene, camera );
 }
 
