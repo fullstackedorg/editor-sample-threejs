@@ -27,7 +27,7 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
     amount: 1,
     depth,
     bevelEnabled: true,
-    bevelSegments: 10,
+    bevelSegments: 50,
     bevelSize: 0.1,
     bevelThickness: 0.05,
   });
@@ -86,19 +86,21 @@ scene.add( cube );
 
 const lineMaterial = new THREE.LineDashedMaterial( {
 	color: 0x9DD1EC,
-    scale: 1,
-	dashSize: 0.001,
+    scale: 50,
+	dashSize: 0.1,
 	gapSize: 10,
 } );
 
-const lines = [
+
+const linesCoords = [
     -delta/2 + 0.15,
     delta/2 - 0.15,
     -0.5,
     0,
     0.5,
-].map((pos, i) => {
-
+]
+const lines = linesCoords.map((pos, i) => {
+    
     const start = i === 0 || i === 1
         ? -delta/2 + 0.15
         : -delta/2;
@@ -139,6 +141,31 @@ const lines = [
     
     return [vLine, hLine];
 }).flat();
+
+
+const diagCurve1 = new THREE.CatmullRomCurve3( [
+    new THREE.Vector3( linesCoords[1], linesCoords[0], 0.06 ),
+    new THREE.Vector3( linesCoords[1] - 0.05, linesCoords[0] + 0.05, 0.1 ),
+    new THREE.Vector3( linesCoords[0] + 0.05, linesCoords[1] - 0.05, 0.1 ),
+    new THREE.Vector3( linesCoords[0], linesCoords[1], 0.06 ),
+] );
+const diagLinePoints1 = diagCurve1.getPoints( 50 )
+const diagLineGeometry1 = new THREE.BufferGeometry().setFromPoints( diagLinePoints1 );
+const diagLine1 = new THREE.Line( diagLineGeometry1, lineMaterial );
+diagLine1.computeLineDistances();
+scene.add( diagLine1 );
+
+const diagCurve2 = new THREE.CatmullRomCurve3( [
+    new THREE.Vector3( linesCoords[1], linesCoords[1], 0.06 ),
+    new THREE.Vector3( linesCoords[1] - 0.05, linesCoords[1] - 0.05, 0.1 ),
+    new THREE.Vector3( linesCoords[0] + 0.05, linesCoords[0] + 0.05, 0.1 ),
+    new THREE.Vector3( linesCoords[0], linesCoords[0], 0.06 ),
+] );
+const diagLinePoints2 = diagCurve2.getPoints( 50 )
+const diagLineGeometry2 = new THREE.BufferGeometry().setFromPoints( diagLinePoints2 );
+const diagLine2 = new THREE.Line( diagLineGeometry2, lineMaterial );
+diagLine2.computeLineDistances();
+scene.add( diagLine2 );
 
 [
     0.4,
@@ -208,13 +235,14 @@ loader.load(
 
 		}
 
-        svg.scale.set(-0.01, 0.01, -0.01);
+        const scale = 0.012
+        svg.scale.set(-scale, scale, -scale);
         svg.rotation.set(0, 0, Math.PI)
         let bb = new THREE.Box3().setFromObject(svg);
         let size = bb.getSize(new THREE.Vector3());
         svg.position.x -= size.x / 2
         svg.position.y += size.y / 2
-        svg.position.z += 0.14
+        svg.position.z += 0.12
 		scene.add( svg );
 
 	}
@@ -225,14 +253,15 @@ function animate() {
 	requestAnimationFrame( animate );
 	controls.update();
     stats.update();
-    lines.forEach(line => {
-        line.material.dashSize += 0.01;
-        line.material.scale -= 0.1;
-        if(line.material.scale <= 0){
-            line.material.dashSize = 0.001;
-            line.material.scale = 600;
-        }
-    })
+    lineMaterial.dashSize += 0.01;
+    if(lineMaterial.dashSize >= 6){
+        lineMaterial.dashSize = 0.1;
+        lineMaterial.scale = 50;
+    }
+    lineMaterial.scale -= 0.1;
+    if(lineMaterial.scale <= 0){
+        lineMaterial.scale = 0;
+    }
 	renderer.render( scene, camera );
 }
 
