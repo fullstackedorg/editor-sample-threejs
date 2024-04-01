@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff)
@@ -9,6 +10,7 @@ const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.inner
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
+renderer.setPixelRatio(2)
 
 const stats = new Stats();
 document.body.appendChild( stats.dom );
@@ -23,13 +25,11 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
   shape.absarc( width - eps, eps, eps, 0, -Math.PI / 2, true );
   let geometry = new THREE.ExtrudeGeometry( shape, {
     amount: 1,
-      depth,
+    depth,
     bevelEnabled: true,
     bevelSegments: 10,
-    // steps: 1,
     bevelSize: 0.1,
     bevelThickness: 0.05,
-    // curveSegments: smoothness
   });
 
     geometry.center();
@@ -140,16 +140,22 @@ const lines = [
     return [vLine, hLine];
 }).flat();
 
-console.log(lines);
+[
+    0.4,
+    0.5,
+    0.8
+].forEach(radius => {
+    const circleGeometry = new THREE.BufferGeometry().setFromPoints(
+        new THREE.Path().absarc(0, 0, radius, 0, Math.PI * 2).getSpacedPoints(100)
+    );
+    const circle = new THREE.LineLoop( circleGeometry, lineMaterial )
+    circle.computeLineDistances()
+    circle.position.z = 0.15
+    
+    scene.add( circle );
+})
 
-const circleGeometry = new THREE.BufferGeometry().setFromPoints(
-    new THREE.Path().absarc(0, 0, 0.5, 0, Math.PI * 2).getSpacedPoints(100)
-);
-const circle = new THREE.LineLoop( circleGeometry, lineMaterial )
-circle.computeLineDistances()
-circle.position.z = 0.15
 
-scene.add( circle );
 
 const light = new THREE.HemisphereLight( 0xfffff, 0xcccccc, 2 ); 
 scene.add( light );
@@ -158,15 +164,83 @@ camera.position.z = 5;
 
 const controls = new OrbitControls( camera, renderer.domElement );
 
+
+// instantiate a loader
+const loader = new SVGLoader();
+let svg;
+// load a SVG resource
+loader.load(
+	// resource URL
+	'logo.svg',
+	// called when the resource is loaded
+	function ( data ) {
+
+		const paths = data.paths;
+		svg = new THREE.Group();
+
+		for ( let i = 0; i < paths.length; i ++ ) {
+			const path = paths[ i ];
+
+			const material = new THREE.MeshStandardMaterial( {
+				color: path.color,
+				side: THREE.DoubleSide,
+				depthWrite: false,
+                transparent: true,
+                opacity: i === 0 ? 0 : 1
+			} );
+
+			const shapes = SVGLoader.createShapes( path );
+
+			for ( let j = 0; j < shapes.length; j ++ ) {
+
+				const shape = shapes[ j ];
+				// const geometry = new THREE.ShapeGeometry( shape );
+
+                let geometry = new THREE.ExtrudeGeometry( shape, {
+                    amount: 1,
+                    depth: 5
+                  });
+				const mesh = new THREE.Mesh( geometry, material );
+                
+				svg.add( mesh );
+
+			}
+
+		}
+
+        svg.scale.set(-0.01, 0.01, -0.01);
+        svg.rotation.set(0, 0, Math.PI)
+        let bb = new THREE.Box3().setFromObject(svg);
+        let size = bb.getSize(new THREE.Vector3());
+        svg.position.x -= size.x / 2
+        svg.position.y += size.y / 2
+        svg.position.z += 0.2
+		scene.add( svg );
+
+	}
+);
+
+
+
+let svgForward = false;
 function animate() {
 	requestAnimationFrame( animate );
 	controls.update();
     stats.update();
     lines.forEach(line => {
-        line.material.dashSize = line.material.dashSize + 0.001;
-        if(line.material.dashSize >= 3.5)
-            line.material.dashSize = 0.001
+        line.material.dashSize += 0.01;
+        line.material.scale -= 0.1;
+        if(line.material.scale <= 0){
+            line.material.dashSize = 0.001;
+            line.material.scale = 600;
+        }
     })
+    if(svg){
+        if(svg.position.z <= 0.09 || svg.position.z >= 0.4) {
+            svgForward = !svgForward
+        }
+        svg.position.z += svgForward ? 0.001 : -0.001;
+    }
 	renderer.render( scene, camera );
 }
 
