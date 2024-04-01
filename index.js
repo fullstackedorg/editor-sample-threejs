@@ -95,9 +95,9 @@ const lineMaterial = new THREE.LineDashedMaterial( {
 const linesCoords = [
     -delta/2 + 0.15,
     delta/2 - 0.15,
-    -0.5,
+    -0.42,
     0,
-    0.5,
+    0.42,
 ]
 const lines = linesCoords.map((pos, i) => {
     
@@ -168,9 +168,9 @@ diagLine2.computeLineDistances();
 scene.add( diagLine2 );
 
 [
-    0.4,
-    0.5,
-    0.8
+    0.42,
+    0.59,
+    0.82
 ].forEach(radius => {
     const circleGeometry = new THREE.BufferGeometry().setFromPoints(
         new THREE.Path().absarc(0, 0, radius, 0, Math.PI * 2).getSpacedPoints(100)
@@ -235,7 +235,7 @@ loader.load(
 
 		}
 
-        const scale = 0.012
+        const scale = 0.0135
         svg.scale.set(-scale, scale, -scale);
         svg.rotation.set(0, 0, Math.PI)
         let bb = new THREE.Box3().setFromObject(svg);
