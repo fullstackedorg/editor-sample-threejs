@@ -126,9 +126,8 @@ function animate() {
 	controls.update();
     stats.update();
     line.material.dashSize = line.material.dashSize + 0.01;
-    if(line.material.dashSize >= 3)
+    if(line.material.dashSize >= 3.5)
         line.material.dashSize = 0.001
-    line.computeLineDistances();
 	renderer.render( scene, camera );
 }
 
