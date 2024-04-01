@@ -91,19 +91,56 @@ const lineMaterial = new THREE.LineDashedMaterial( {
 	gapSize: 10,
 } );
 
-const curve = new THREE.CatmullRomCurve3( [
-	new THREE.Vector3( 0, -delta/2, 0.06 ),
-	new THREE.Vector3( 0, -delta/2 + 0.05, 0.1 ),
-	new THREE.Vector3( 0, delta/2 - 0.05, 0.1 ),
-	new THREE.Vector3( 0, delta/2, 0.06 )
-] );
-const linePoints = curve.getPoints( 50 )
+const lines = [
+    -delta/2 + 0.15,
+    delta/2 - 0.15,
+    -0.5,
+    0,
+    0.5,
+].map((pos, i) => {
 
-const lineGeometry = new THREE.BufferGeometry().setFromPoints( linePoints );
+    const start = i === 0 || i === 1
+        ? -delta/2 + 0.15
+        : -delta/2;
+    const end = i === 0 || i === 1
+        ? delta/2 - 0.15
+        : delta/2
+    
+    const curvePoints = [
+        [start, 0.06],
+        [start + 0.05, 0.1],
+        [end - 0.05, 0.1],
+        [end, 0.06]
+    ]
 
-const line = new THREE.Line( lineGeometry, lineMaterial );
-line.computeLineDistances();
-scene.add( line );
+    const vCurve = new THREE.CatmullRomCurve3( [
+    	new THREE.Vector3( pos, ...curvePoints[0] ),
+    	new THREE.Vector3( pos, ...curvePoints[1] ),
+    	new THREE.Vector3( pos, ...curvePoints[2] ),
+    	new THREE.Vector3( pos, ...curvePoints[3] )
+    ] );
+    const vLinePoints = vCurve.getPoints( 50 )
+    const vLineGeometry = new THREE.BufferGeometry().setFromPoints( vLinePoints );
+    const vLine = new THREE.Line( vLineGeometry, lineMaterial );
+    vLine.computeLineDistances();
+    scene.add( vLine );
+
+    const hCurve = new THREE.CatmullRomCurve3( [
+    	new THREE.Vector3( curvePoints[0][0], pos, curvePoints[0][1] ),
+    	new THREE.Vector3( curvePoints[1][0], pos, curvePoints[1][1] ),
+    	new THREE.Vector3( curvePoints[2][0], pos, curvePoints[2][1] ),
+    	new THREE.Vector3( curvePoints[3][0], pos, curvePoints[3][1] ),
+    ] );
+    const hLinePoints = hCurve.getPoints( 50 )
+    const hLineGeometry = new THREE.BufferGeometry().setFromPoints( hLinePoints );
+    const hLine = new THREE.Line( hLineGeometry, lineMaterial );
+    hLine.computeLineDistances();
+    scene.add( hLine );
+    
+    return [vLine, hLine];
+}).flat();
+
+console.log(lines);
 
 const circleGeometry = new THREE.BufferGeometry().setFromPoints(
     new THREE.Path().absarc(0, 0, 0.5, 0, Math.PI * 2).getSpacedPoints(100)
@@ -125,9 +162,11 @@ function animate() {
 	requestAnimationFrame( animate );
 	controls.update();
     stats.update();
-    line.material.dashSize = line.material.dashSize + 0.01;
-    if(line.material.dashSize >= 3.5)
-        line.material.dashSize = 0.001
+    lines.forEach(line => {
+        line.material.dashSize = line.material.dashSize + 0.001;
+        if(line.material.dashSize >= 3.5)
+            line.material.dashSize = 0.001
+    })
 	renderer.render( scene, camera );
 }
 
