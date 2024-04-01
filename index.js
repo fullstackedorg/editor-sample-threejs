@@ -87,7 +87,7 @@ scene.add( cube );
 const lineMaterial = new THREE.LineDashedMaterial( {
 	color: 0x9DD1EC,
     scale: 50,
-	dashSize: 0.1,
+	dashSize: 1,
 	gapSize: 10,
 } );
 
@@ -254,8 +254,8 @@ function animate() {
 	controls.update();
     stats.update();
     lineMaterial.dashSize += 0.01;
-    if(lineMaterial.dashSize >= 6){
-        lineMaterial.dashSize = 0.1;
+    if(lineMaterial.dashSize >= 7){
+        lineMaterial.dashSize = 1;
         lineMaterial.scale = 50;
     }
     lineMaterial.scale -= 0.1;
