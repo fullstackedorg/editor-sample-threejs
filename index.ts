@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import Stats from 'three/addons/libs/stats.module.js';
-import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff)
@@ -15,16 +15,17 @@ renderer.setPixelRatio(window.devicePixelRatio)
 const stats = new Stats();
 document.body.appendChild( stats.dom );
 
-function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) {
+function createBoxWithRoundedEdges( 
+    width: number, 
+    height: number, 
+    depth: number) {
   let shape = new THREE.Shape();
   let eps = 0.4;
-  let radius = radius0 - eps;
   shape.absarc( eps, eps, eps, -Math.PI / 2, -Math.PI, true );
   shape.absarc( eps, height -  eps, eps, Math.PI, Math.PI / 2, true );
   shape.absarc( width - eps, height -  eps, eps, Math.PI / 2, 0, true );
   shape.absarc( width - eps, eps, eps, 0, -Math.PI / 2, true );
   let geometry = new THREE.ExtrudeGeometry( shape, {
-    amount: 1,
     depth,
     bevelEnabled: true,
     bevelSegments: 50,
@@ -38,7 +39,7 @@ function createBoxWithRoundedEdges( width, height, depth, radius0, smoothness ) 
 }
 
 
-const geometry = createBoxWithRoundedEdges( 2, 2, 0.08, 0.1, 3 );
+const geometry = createBoxWithRoundedEdges( 2, 2, 0.08 );
 
 const count = geometry.attributes.position.count;
 geometry.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
@@ -99,7 +100,8 @@ const linesCoords = [
     0,
     0.42,
 ]
-const lines = linesCoords.map((pos, i) => {
+
+linesCoords.map((pos, i) => {
     
     const start = i === 0 || i === 1
         ? -delta/2 + 0.15
@@ -194,7 +196,7 @@ const controls = new OrbitControls( camera, renderer.domElement );
 
 // instantiate a loader
 const loader = new SVGLoader();
-let svg;
+let svg: THREE.Group;
 // load a SVG resource
 loader.load(
 	// resource URL
@@ -224,7 +226,6 @@ loader.load(
 				// const geometry = new THREE.ShapeGeometry( shape );
 
                 let geometry = new THREE.ExtrudeGeometry( shape, {
-                    amount: 1,
                     depth: 5
                   });
 				const mesh = new THREE.Mesh( geometry, material );
